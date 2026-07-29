@@ -65,9 +65,9 @@ function Invoke-MuxxCheckCommand {
         }
         if(-not $tools.Count){throw "No known tools were selected."}
         $results=Invoke-MuxxToolCheck -Tools $tools -ResolveVersion -TimeoutSeconds 3
-        Offer-MuxxInstallations $results
     }
     $sw.Stop();Write-MuxxSummary $results $sw
+    if(-not $all){Offer-MuxxInstallations $results}
 }
 function Invoke-MuxxWhereCommand {
     param([string[]]$Arguments)

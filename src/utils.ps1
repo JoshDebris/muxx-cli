@@ -23,12 +23,12 @@ function Invoke-MuxxProcess {
         [void]$p.Start()
         if(-not $p.WaitForExit($TimeoutSeconds*1000)){
             try{$p.Kill()}catch{}
-            return [pscustomobject]@{Success=$false;TimedOut=$true;Output="";Error="Timeout"}
+            return [pscustomobject]@{Success=$false;TimedOut=$true;ExitCode=$null;Output="";Error="Timeout"}
         }
         $out=($p.StandardOutput.ReadToEnd()+"`n"+$p.StandardError.ReadToEnd()).Trim()
-        return [pscustomobject]@{Success=($p.ExitCode -eq 0);TimedOut=$false;Output=$out;Error=""}
+        return [pscustomobject]@{Success=($p.ExitCode -eq 0);TimedOut=$false;ExitCode=$p.ExitCode;Output=$out;Error=""}
     }catch{
-        return [pscustomobject]@{Success=$false;TimedOut=$false;Output="";Error=$_.Exception.Message}
+        return [pscustomobject]@{Success=$false;TimedOut=$false;ExitCode=$null;Output="";Error=$_.Exception.Message}
     }finally{$p.Dispose()}
 }
 function Test-MuxxInteractive {

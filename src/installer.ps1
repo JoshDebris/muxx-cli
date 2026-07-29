@@ -1,4 +1,13 @@
 ﻿function Test-MuxxWinget { return $null -ne (Get-Command winget.exe -ErrorAction SilentlyContinue|Select-Object -First 1) }
+function Get-MuxxInstallReason {
+    param([object]$Result)
+    if($Result.TimedOut){return "Installation timed out."}
+    if($Result.Error){return $Result.Error}
+    $line=Get-MuxxFirstLine $Result.Output
+    if($line){return $line}
+    if($null -ne $Result.ExitCode){return "winget exited with code $($Result.ExitCode)."}
+    return "winget did not provide a detailed error."
+}
 function Install-MuxxWinget {
     param([switch]$AssumeYes)
     Write-Host ""
@@ -17,7 +26,12 @@ function Install-MuxxWinget {
         Add-AppxPackage -Path $tmp
         return Test-MuxxWinget
     }catch{
-        Write-MuxxError "Winget installation failed: $($_.Exception.Message)"
+        Write-Host "Winget installation failed." -ForegroundColor Red
+        Write-Host ""
+        Write-Host "Reason:" -ForegroundColor DarkGray
+        Write-Host $($_.Exception.Message)
+        Write-Host ""
+        Write-Host "You can download Winget manually:" -ForegroundColor DarkGray
         Write-Host "https://github.com/microsoft/winget-cli/releases" -ForegroundColor DarkGray
         return $false
     }finally{
@@ -47,7 +61,14 @@ function Install-MuxxTool {
     Write-Host "Installing $($Tool.Name)..." -ForegroundColor Yellow
     $r=Invoke-MuxxProcess -FilePath "winget.exe" -Arguments @("install","--id",$Tool.WingetId,"--exact","--accept-package-agreements","--accept-source-agreements") -TimeoutSeconds 900
     if(-not $r.Success){
-        Write-MuxxError "Installation failed."
+        Write-Host "Installation failed." -ForegroundColor Red
+        Write-Host ""
+        Write-Host "Winget could not install $($Tool.Name)."
+        Write-Host ""
+        Write-Host "Reason:" -ForegroundColor DarkGray
+        Write-Host (Get-MuxxInstallReason $r)
+        Write-Host ""
+        Write-Host "You can download $($Tool.Name) manually:" -ForegroundColor DarkGray
         Write-Host $Tool.Website -ForegroundColor DarkGray
         return $false
     }

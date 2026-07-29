@@ -57,7 +57,6 @@ function Write-MuxxSummary {
     Write-Host ("Warnings".PadRight(18)) -ForegroundColor DarkGray -NoNewline; Write-Host $warn -ForegroundColor Yellow
     Write-Host ("Score".PadRight(18)) -ForegroundColor DarkGray -NoNewline; Write-Host "$score%"
     if($Stopwatch){
-        Write-Host ("Completed in".PadRight(18)) -ForegroundColor DarkGray -NoNewline
-        Write-Host ("{0:N2} seconds" -f $Stopwatch.Elapsed.TotalSeconds)
+        Write-Host ("Environment check completed in {0:N2} seconds." -f $Stopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkGray
     }
 }
