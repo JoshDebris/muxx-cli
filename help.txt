@@ -1,31 +1,18 @@
-﻿MUXX-CLI v1.0
-=============
-Environment Check
+MUXX-CLI v1.0.0
 
-USAGE
-  muxx
-  muxx check <tools>
-  muxx check --all
-  muxx doc
-  muxx where <tool>
-  muxx help
-  muxx version
+Usage:
+  muxx                 Run environment check
+  muxx check <tool>    Check specific tool
+  muxx install <tool>  Install missing tool
+  muxx where <tool>    Show tool location
+  muxx help            Show help
 
-EXAMPLES
-  muxx check php node composer
-  muxx check --all
-  muxx where php
-
-STATUS
-  ✅ Installed
-  ❌ Not installed
-  ⚠️ Warning
-
-PHILOSOPHY
-  Runs on every Windows machine.
-  No external dependencies.
-  No required fonts.
-  No PowerShell modules.
-  No Internet connection required for normal checks.
-
-  MUXX first. Fancy later.
+Available checks:
+  git
+  node
+  npm
+  python
+  php
+  composer
+  rust
+  docker

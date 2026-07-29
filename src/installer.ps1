@@ -1,8 +1,9 @@
 ﻿function Test-MuxxWinget { return $null -ne (Get-Command winget.exe -ErrorAction SilentlyContinue|Select-Object -First 1) }
 function Install-MuxxWinget {
+    param([switch]$AssumeYes)
     Write-Host ""
     Write-Host "MUXX can download the latest official Winget MSIX bundle from GitHub." -ForegroundColor Yellow
-    if(-not(Read-MuxxYesNo "Install Winget now?")){return $false}
+    if(-not $AssumeYes -and -not(Read-MuxxYesNo "Install Winget now?")){return $false}
     $tmp=Join-Path $env:TEMP "muxx-winget.msixbundle"
     $previousProgressPreference=$ProgressPreference
     $ProgressPreference="SilentlyContinue"
@@ -25,7 +26,7 @@ function Install-MuxxWinget {
     }
 }
 function Install-MuxxTool {
-    param([hashtable]$Tool)
+    param([hashtable]$Tool,[switch]$AssumeYes)
     if(-not $Tool.WingetId){
         Write-Host "Please install $($Tool.Name) manually:" -ForegroundColor DarkGray
         Write-Host $Tool.Website -ForegroundColor DarkGray
@@ -33,7 +34,7 @@ function Install-MuxxTool {
     }
     if(-not(Test-MuxxWinget)){
         Write-Host "❌ Winget is not available." -ForegroundColor Red
-        if(-not(Install-MuxxWinget)){
+        if(-not(Install-MuxxWinget -AssumeYes:$AssumeYes)){
             Write-Host "Please install $($Tool.Name) manually:" -ForegroundColor DarkGray
             Write-Host $Tool.Website -ForegroundColor DarkGray
             return $false
@@ -42,7 +43,7 @@ function Install-MuxxTool {
     $display="winget install --id $($Tool.WingetId) --exact --accept-package-agreements --accept-source-agreements"
     Write-Host "Recommended command:" -ForegroundColor DarkGray
     Write-Host $display -ForegroundColor DarkGray
-    if(-not(Read-MuxxYesNo "Install $($Tool.Name) now?")){return $false}
+    if(-not $AssumeYes -and -not(Read-MuxxYesNo "Install $($Tool.Name) now?")){return $false}
     Write-Host "Installing $($Tool.Name)..." -ForegroundColor Yellow
     $r=Invoke-MuxxProcess -FilePath "winget.exe" -Arguments @("install","--id",$Tool.WingetId,"--exact","--accept-package-agreements","--accept-source-agreements") -TimeoutSeconds 900
     if(-not $r.Success){
