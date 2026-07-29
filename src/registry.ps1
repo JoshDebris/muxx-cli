@@ -4,7 +4,7 @@
 @{Id="node";Aliases=@("nodejs");Name="Node.js";Category="JavaScript";Command="node";Args=@("--version");Pattern="v?([0-9][^\s]*)";WingetId="OpenJS.NodeJS.LTS";Website="https://nodejs.org/";Quick=$true},
 @{Id="npm";Name="npm";Category="JavaScript";Command="npm.cmd";Args=@("--version");Pattern="([0-9][^\s]*)";WingetId="";Website="https://www.npmjs.com/";Quick=$true},
 @{Id="python";Aliases=@("py");Name="Python";Category="Python";Command="python";Args=@("--version");Pattern="Python\s+([^\s]+)";WingetId="Python.Python.3.13";Website="https://www.python.org/downloads/windows/";Quick=$true},
-@{Id="php";Name="PHP";Category="PHP";Command="php";Args=@("--version");Pattern="PHP\s+([^\s]+)";WingetId="PHP.PHP.8.4";Website="https://windows.php.net/download/";Quick=$true},
+@{Id="php";Name="PHP";Category="PHP";Command="php";Args=@("--version");Pattern="PHP\s+([^\s]+)";WingetId="PHP.PHP.8.5";Website="https://windows.php.net/download/";Quick=$true},
 @{Id="composer";Name="Composer";Category="PHP";Command="composer";Args=@("--version");Pattern="Composer(?:\s+version)?\s+([^\s]+)";WingetId="Composer.Composer";Website="https://getcomposer.org/download/";Quick=$true},
 @{Id="rust";Aliases=@("rustc");Name="Rust";Category="Languages and SDKs";Command="rustc";Args=@("--version");Pattern="rustc\s+([^\s]+)";WingetId="Rustlang.Rustup";Website="https://rustup.rs/";Quick=$false},
 @{Id="cargo";Name="Cargo";Category="Languages and SDKs";Command="cargo";Args=@("--version");Pattern="cargo\s+([^\s]+)";WingetId="Rustlang.Rustup";Website="https://rustup.rs/";Quick=$false},
