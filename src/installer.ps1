@@ -1,55 +1,4 @@
-﻿function Test-MuxxWinget { return $null -ne (Get-Command winget.exe -ErrorAction SilentlyContinue|Select-Object -First 1) }
-function Test-MuxxWingetNoiseLine {
-    param([string]$Line)
-    return (
-        $Line -match '^(Found|Gefunden)\s' -or
-        $Line -match '^(Downloading|Herunterladen|Installing|Installieren)\s' -or
-        $Line -match '^(Successfully|Erfolgreich)\s' -or
-        $Line -match 'licensed to you by its owner|von ihrem Besitzer an Sie lizenziert' -or
-        $Line -match '^\s*[-\\|/]+\s*$' -or
-        $Line -match '^[█▒░#=\-\\|/.\s]+$'
-    )
-}
-function Get-MuxxInstallReason {
-    param([object]$Result)
-    if($Result.TimedOut){return "Installation timed out."}
-    if($Result.Error){return $Result.Error}
-    $wingetErrors=@{
-        -1978335224="winget could not download the installer."
-        -1978335156="winget could not validate package dependencies."
-        -1978335152="winget failed to install the portable package."
-        -1978335150="winget had trouble parsing localized installer output."
-        -1978335148="A portable package from a different source already exists."
-        -1978334974="Another installation is already in progress."
-        -1978334973="One or more files are currently in use."
-        -1978334972="A package dependency is missing from this system."
-        -1978334969="The installer requires an internet connection."
-    }
-    if($null -ne $Result.ExitCode -and $wingetErrors.ContainsKey($Result.ExitCode)){
-        return $wingetErrors[$Result.ExitCode]
-    }
-    $lines=@($Result.Output -split "`r?`n"|ForEach-Object{$_.Trim()}|Where-Object{$_})
-    foreach($line in $lines){
-        if($line -match 'kein Paket gefunden|No package found|No installed package found|No package found matching|Eingabekriterien'){
-            return "No package found matching the requested Winget ID."
-        }
-    }
-    $reason=$lines|Where-Object{-not(Test-MuxxWingetNoiseLine $_)}|Select-Object -First 1
-    if($reason){return $reason}
-    if($Result.Output -match '(?im)^(Found|Gefunden)\s' -and $null -ne $Result.ExitCode){
-        return "winget found the package, but installation failed with exit code $($Result.ExitCode)."
-    }
-    if($Result.Output -match '(?im)^(Found|Gefunden)\s'){
-        return "winget found the package, but installation did not complete."
-    }
-    $line=Get-MuxxFirstLine $Result.Output
-    if($line -match 'kein Paket gefunden|No package found|No installed package found|No package found matching|Eingabekriterien'){
-        return "No package found matching the requested Winget ID."
-    }
-    if($line){return $line}
-    if($null -ne $Result.ExitCode){return "winget exited with code $($Result.ExitCode)."}
-    return "winget did not provide a detailed error."
-}
+function Test-MuxxWinget { return $null -ne (Get-Command winget.exe -ErrorAction SilentlyContinue|Select-Object -First 1) }
 function Install-MuxxWinget {
     param([switch]$AssumeYes)
     Write-Host ""
@@ -106,17 +55,12 @@ function Install-MuxxTool {
     if(-not $r.Success){
         Write-Host "Installation failed." -ForegroundColor Red
         Write-Host ""
-        Write-Host "Winget could not install $($Tool.Name)."
-        if($r.Error){
-            Write-Host ""
-            Write-Host "Reason:" -ForegroundColor DarkGray
-            Write-Host $r.Error
-        }elseif($null -ne $r.ExitCode){
-            Write-Host ""
-            Write-Host "Winget exited with code $($r.ExitCode)." -ForegroundColor DarkGray
-        }
+        Write-Host "$($Tool.Name) installation via Winget did not complete."
+        if($null -ne $r.ExitCode){Write-Host "Winget exited with code $($r.ExitCode)." -ForegroundColor DarkGray}
+        if($r.Error){Write-Host $r.Error -ForegroundColor DarkGray}
         Write-Host ""
-        Write-Host "You can download $($Tool.Name) manually:" -ForegroundColor DarkGray
+        Write-Host "Recommended:" -ForegroundColor DarkGray
+        Write-Host "Download $($Tool.Name) manually from the official website:"
         Write-Host $Tool.Website -ForegroundColor DarkGray
         return $false
     }
