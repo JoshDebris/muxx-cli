@@ -4,6 +4,9 @@ function Get-MuxxInstallReason {
     if($Result.TimedOut){return "Installation timed out."}
     if($Result.Error){return $Result.Error}
     $line=Get-MuxxFirstLine $Result.Output
+    if($line -match 'kein Paket gefunden|No package found|No installed package found|No package found matching|Eingabekriterien'){
+        return "No package found matching the requested Winget ID."
+    }
     if($line){return $line}
     if($null -ne $Result.ExitCode){return "winget exited with code $($Result.ExitCode)."}
     return "winget did not provide a detailed error."
@@ -83,6 +86,6 @@ function Offer-MuxxInstallations {
     if(-not(Test-MuxxInteractive)){return}
     foreach($r in ($Results|Where-Object Status -eq "NotInstalled")){
         Write-Host ""
-        if(Read-MuxxYesNo "Do you want to install $($r.Name) now?"){[void](Install-MuxxTool $r.Tool)}
+        if(Read-MuxxYesNo "Do you want to install $($r.Name) now?"){[void](Install-MuxxTool -Tool $r.Tool -AssumeYes)}
     }
 }
