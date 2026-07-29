@@ -3,6 +3,39 @@ function Get-MuxxInstallReason {
     param([object]$Result)
     if($Result.TimedOut){return "Installation timed out."}
     if($Result.Error){return $Result.Error}
+    $wingetErrors=@{
+        -1978335224="winget could not download the installer."
+        -1978335156="winget could not validate package dependencies."
+        -1978335152="winget failed to install the portable package."
+        -1978335150="winget had trouble parsing localized installer output."
+        -1978335148="A portable package from a different source already exists."
+        -1978334974="Another installation is already in progress."
+        -1978334973="One or more files are currently in use."
+        -1978334972="A package dependency is missing from this system."
+        -1978334969="The installer requires an internet connection."
+    }
+    if($null -ne $Result.ExitCode -and $wingetErrors.ContainsKey($Result.ExitCode)){
+        return $wingetErrors[$Result.ExitCode]
+    }
+    $lines=@($Result.Output -split "`r?`n"|ForEach-Object{$_.Trim()}|Where-Object{$_})
+    foreach($line in $lines){
+        if($line -match 'kein Paket gefunden|No package found|No installed package found|No package found matching|Eingabekriterien'){
+            return "No package found matching the requested Winget ID."
+        }
+    }
+    $reason=$lines|Where-Object{
+        $_ -notmatch '^(Found|Gefunden)\s' -and
+        $_ -notmatch '^(Downloading|Herunterladen|Installing|Installieren)\s' -and
+        $_ -notmatch '^\s*[-\\|/]+\s*$' -and
+        $_ -notmatch '^[█▒░#=\-\\|/.\s]+$'
+    }|Select-Object -First 1
+    if($reason){return $reason}
+    if($Result.Output -match '(?im)^(Found|Gefunden)\s' -and $null -ne $Result.ExitCode){
+        return "winget found the package, but installation failed with exit code $($Result.ExitCode)."
+    }
+    if($Result.Output -match '(?im)^(Found|Gefunden)\s'){
+        return "winget found the package, but installation did not complete."
+    }
     $line=Get-MuxxFirstLine $Result.Output
     if($line -match 'kein Paket gefunden|No package found|No installed package found|No package found matching|Eingabekriterien'){
         return "No package found matching the requested Winget ID."
@@ -57,12 +90,13 @@ function Install-MuxxTool {
             return $false
         }
     }
-    $display="winget install --id $($Tool.WingetId) --exact --accept-package-agreements --accept-source-agreements"
+    $wingetArgs=@("install","--id",$Tool.WingetId,"--exact","--source","winget","--silent","--disable-interactivity","--accept-package-agreements","--accept-source-agreements")
+    $display="winget $((ConvertTo-MuxxArguments $wingetArgs))"
     Write-Host "Recommended command:" -ForegroundColor DarkGray
     Write-Host $display -ForegroundColor DarkGray
     if(-not $AssumeYes -and -not(Read-MuxxYesNo "Install $($Tool.Name) now?")){return $false}
     Write-Host "Installing $($Tool.Name)..." -ForegroundColor Yellow
-    $r=Invoke-MuxxProcess -FilePath "winget.exe" -Arguments @("install","--id",$Tool.WingetId,"--exact","--accept-package-agreements","--accept-source-agreements") -TimeoutSeconds 900
+    $r=Invoke-MuxxProcess -FilePath "winget.exe" -Arguments $wingetArgs -TimeoutSeconds 900
     if(-not $r.Success){
         Write-Host "Installation failed." -ForegroundColor Red
         Write-Host ""
