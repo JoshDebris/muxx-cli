@@ -6,6 +6,7 @@ $previousProgressPreference=$ProgressPreference
 $ProgressPreference="SilentlyContinue"
 $dir=Join-Path $env:LOCALAPPDATA "MUXX"
 $base="https://raw.githubusercontent.com/$Repository/$Branch"
+$cacheBust=[DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
 $files=@(
     @{Source="muxx.ps1";Target="muxx-core.ps1"},
     @{Source="muxx.cmd";Target="muxx.cmd"},
@@ -22,7 +23,7 @@ try{
     foreach($f in $files){
         $target=Join-Path $dir $f.Target
         New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force|Out-Null
-        Invoke-WebRequest -Uri "$base/$($f.Source)" -OutFile $target -UseBasicParsing
+        Invoke-WebRequest -Uri "$base/$($f.Source)?cb=$cacheBust" -OutFile $target -UseBasicParsing
     }
     Remove-Item (Join-Path $dir "muxx.ps1") -Force -ErrorAction SilentlyContinue
 }finally{
