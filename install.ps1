@@ -33,5 +33,9 @@ $parts=@($userPath -split ";"|Where-Object{$_})
 if($parts -notcontains $dir){
     [Environment]::SetEnvironmentVariable("Path",(($parts+$dir)|Select-Object -Unique)-join ";","User")
 }
+$sessionParts=@($env:Path -split ";"|Where-Object{$_})
+if($sessionParts -notcontains $dir){
+    $env:Path=(($sessionParts+$dir)|Select-Object -Unique)-join ";"
+}
 Write-Host "✅ MUXX-CLI installed." -ForegroundColor Green
-Write-Host "Open a new terminal and run: muxx" -ForegroundColor DarkGray
+Write-Host "Run: muxx" -ForegroundColor DarkGray
