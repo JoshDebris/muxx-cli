@@ -1,4 +1,3 @@
-﻿#requires -version 5.1
 $ErrorActionPreference="Stop"
 $Repository="JoshDebris/muxx-cli"
 $Branch="v1.0.0"
