@@ -1,6 +1,6 @@
 ﻿#requires -version 5.1
 [CmdletBinding()]
-param([string]$Repository="JoshDebris/muxx-cli",[string]$Branch="main")
+param([string]$Repository="JoshDebris/muxx-cli",[string]$Branch="v1.0.0")
 $ErrorActionPreference="Stop"
 $previousProgressPreference=$ProgressPreference
 $ProgressPreference="SilentlyContinue"
