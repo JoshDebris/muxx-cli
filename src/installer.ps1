@@ -1,4 +1,15 @@
 ﻿function Test-MuxxWinget { return $null -ne (Get-Command winget.exe -ErrorAction SilentlyContinue|Select-Object -First 1) }
+function Test-MuxxWingetNoiseLine {
+    param([string]$Line)
+    return (
+        $Line -match '^(Found|Gefunden)\s' -or
+        $Line -match '^(Downloading|Herunterladen|Installing|Installieren)\s' -or
+        $Line -match '^(Successfully|Erfolgreich)\s' -or
+        $Line -match 'licensed to you by its owner|von ihrem Besitzer an Sie lizenziert' -or
+        $Line -match '^\s*[-\\|/]+\s*$' -or
+        $Line -match '^[█▒░#=\-\\|/.\s]+$'
+    )
+}
 function Get-MuxxInstallReason {
     param([object]$Result)
     if($Result.TimedOut){return "Installation timed out."}
@@ -23,12 +34,7 @@ function Get-MuxxInstallReason {
             return "No package found matching the requested Winget ID."
         }
     }
-    $reason=$lines|Where-Object{
-        $_ -notmatch '^(Found|Gefunden)\s' -and
-        $_ -notmatch '^(Downloading|Herunterladen|Installing|Installieren)\s' -and
-        $_ -notmatch '^\s*[-\\|/]+\s*$' -and
-        $_ -notmatch '^[█▒░#=\-\\|/.\s]+$'
-    }|Select-Object -First 1
+    $reason=$lines|Where-Object{-not(Test-MuxxWingetNoiseLine $_)}|Select-Object -First 1
     if($reason){return $reason}
     if($Result.Output -match '(?im)^(Found|Gefunden)\s' -and $null -ne $Result.ExitCode){
         return "winget found the package, but installation failed with exit code $($Result.ExitCode)."
@@ -107,6 +113,9 @@ function Install-MuxxTool {
         Write-Host ""
         Write-Host "You can download $($Tool.Name) manually:" -ForegroundColor DarkGray
         Write-Host $Tool.Website -ForegroundColor DarkGray
+        Write-Host ""
+        Write-Host "To see Winget's full output, run:" -ForegroundColor DarkGray
+        Write-Host $display
         return $false
     }
     Write-Host "Verifying installation..." -ForegroundColor DarkGray
