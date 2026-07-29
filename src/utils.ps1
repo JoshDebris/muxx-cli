@@ -34,10 +34,11 @@ function Invoke-MuxxProcess {
 function Invoke-MuxxInteractiveProcess {
     param([string]$FilePath,[string[]]$Arguments=@())
     try{
-        & $FilePath @Arguments
-        return [pscustomobject]@{Success=($LASTEXITCODE -eq 0);ExitCode=$LASTEXITCODE;Error=""}
+        & $FilePath @Arguments|ForEach-Object{Write-Host $_}
+        $exitCode=$LASTEXITCODE
+        Write-Output -NoEnumerate ([pscustomobject]@{Success=($exitCode -eq 0);ExitCode=$exitCode;Error=""})
     }catch{
-        return [pscustomobject]@{Success=$false;ExitCode=$null;Error=$_.Exception.Message}
+        Write-Output -NoEnumerate ([pscustomobject]@{Success=$false;ExitCode=$null;Error=$_.Exception.Message})
     }
 }
 function Test-MuxxInteractive {
