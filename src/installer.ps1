@@ -96,26 +96,28 @@ function Install-MuxxTool {
             return $false
         }
     }
-    $wingetArgs=@("install","--id",$Tool.WingetId,"--exact","--source","winget","--silent","--disable-interactivity","--accept-package-agreements","--accept-source-agreements")
+    $wingetArgs=@("install","--id",$Tool.WingetId,"--exact","--source","winget","--accept-package-agreements","--accept-source-agreements")
     $display="winget $((ConvertTo-MuxxArguments $wingetArgs))"
     Write-Host "Recommended command:" -ForegroundColor DarkGray
     Write-Host $display -ForegroundColor DarkGray
     if(-not $AssumeYes -and -not(Read-MuxxYesNo "Install $($Tool.Name) now?")){return $false}
     Write-Host "Installing $($Tool.Name)..." -ForegroundColor Yellow
-    $r=Invoke-MuxxProcess -FilePath "winget.exe" -Arguments $wingetArgs -TimeoutSeconds 900
+    $r=Invoke-MuxxInteractiveProcess -FilePath "winget.exe" -Arguments $wingetArgs
     if(-not $r.Success){
         Write-Host "Installation failed." -ForegroundColor Red
         Write-Host ""
         Write-Host "Winget could not install $($Tool.Name)."
-        Write-Host ""
-        Write-Host "Reason:" -ForegroundColor DarkGray
-        Write-Host (Get-MuxxInstallReason $r)
+        if($r.Error){
+            Write-Host ""
+            Write-Host "Reason:" -ForegroundColor DarkGray
+            Write-Host $r.Error
+        }elseif($null -ne $r.ExitCode){
+            Write-Host ""
+            Write-Host "Winget exited with code $($r.ExitCode)." -ForegroundColor DarkGray
+        }
         Write-Host ""
         Write-Host "You can download $($Tool.Name) manually:" -ForegroundColor DarkGray
         Write-Host $Tool.Website -ForegroundColor DarkGray
-        Write-Host ""
-        Write-Host "To see Winget's full output, run:" -ForegroundColor DarkGray
-        Write-Host $display
         return $false
     }
     Write-Host "Verifying installation..." -ForegroundColor DarkGray

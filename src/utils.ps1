@@ -31,6 +31,15 @@ function Invoke-MuxxProcess {
         return [pscustomobject]@{Success=$false;TimedOut=$false;ExitCode=$null;Output="";Error=$_.Exception.Message}
     }finally{$p.Dispose()}
 }
+function Invoke-MuxxInteractiveProcess {
+    param([string]$FilePath,[string[]]$Arguments=@())
+    try{
+        & $FilePath @Arguments
+        return [pscustomobject]@{Success=($LASTEXITCODE -eq 0);ExitCode=$LASTEXITCODE;Error=""}
+    }catch{
+        return [pscustomobject]@{Success=$false;ExitCode=$null;Error=$_.Exception.Message}
+    }
+}
 function Test-MuxxInteractive {
     try { return [Environment]::UserInteractive -and -not [Console]::IsInputRedirected } catch { return $false }
 }
