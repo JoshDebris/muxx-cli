@@ -19,7 +19,7 @@ muxx help
 ## Install
 
 ```powershell
-irm https://raw.githubusercontent.com/JoshDebris/muxx-cli/v1.0.0/install.ps1 | iex
+iex (irm https://raw.githubusercontent.com/JoshDebris/muxx-cli/v1.0.0/install.ps1)
 ```
 
 ## Design Principles
