@@ -77,11 +77,36 @@ function Invoke-MuxxWhereCommand {
     if(-not $tool){throw "Unknown tool: $id"}
     Write-MuxxHeader "Tool Location"
     $r=Test-MuxxTool -Tool $tool -ResolveVersion
-    Write-MuxxToolResult $r
     if($r.Installed){
+        Write-MuxxToolResult $r
         Write-Host "";Write-MuxxSection "Location"
         Write-Host ("Executable".PadRight(18)) -ForegroundColor DarkGray -NoNewline;Write-Host $r.Path
         Write-Host ("PATH entry".PadRight(18)) -ForegroundColor DarkGray -NoNewline;Write-Host (Split-Path -Parent $r.Path)
+    }else{
+        $locations=Find-MuxxToolLocations -Tool $tool
+        Write-Host $tool.Name
+        Write-Host ""
+        if($locations.Found.Count){
+            Write-Host "⚠️  Found outside PATH" -ForegroundColor Yellow
+            Write-Host ""
+            Write-Host "Locations:" -ForegroundColor DarkGray
+            foreach($found in $locations.Found){
+                Write-Host "- $($found.Path)"
+            }
+            Write-Host ""
+            Write-Host "Next:" -ForegroundColor DarkGray
+            Write-Host "  Add the directory to PATH, then open a new terminal."
+        }else{
+            Write-Host "❌ Not installed" -ForegroundColor Red
+            Write-Host ""
+            Write-Host "Search paths checked:" -ForegroundColor DarkGray
+            foreach($source in $locations.Checked){
+                Write-Host "- $source"
+            }
+            Write-Host ""
+            Write-Host "Install:" -ForegroundColor DarkGray
+            Write-Host "  muxx install $($tool.Id)"
+        }
     }
 }
 function Invoke-MuxxCommand {
