@@ -1,7 +1,7 @@
 ﻿#requires -version 5.1
-[CmdletBinding()]
-param([string]$Repository="JoshDebris/muxx-cli",[string]$Branch="v1.0.0")
 $ErrorActionPreference="Stop"
+$Repository="JoshDebris/muxx-cli"
+$Branch="v1.0.0"
 $previousProgressPreference=$ProgressPreference
 $ProgressPreference="SilentlyContinue"
 $dir=Join-Path $env:LOCALAPPDATA "MUXX"
