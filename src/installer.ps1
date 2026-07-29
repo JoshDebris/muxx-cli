@@ -67,7 +67,7 @@ function Install-MuxxTool {
     Write-Host "Verifying installation..." -ForegroundColor DarkGray
     $v=Test-MuxxTool -Tool $Tool -ResolveVersion -TimeoutSeconds 5
     if($v.Installed){Write-MuxxToolResult $v;return $true}
-    Write-Host "⚠️  Installed, but not visible in this terminal yet. Open a new terminal." -ForegroundColor Yellow
+    Write-Host "Installed, but not visible in this terminal yet. Open a new terminal." -ForegroundColor Yellow
     return $false
 }
 function Offer-MuxxInstallations {
