@@ -64,7 +64,7 @@ function Invoke-MuxxCheckCommand {
             if($t){$tools+=$t}else{Write-Host "⚠️  Unknown tool: $id" -ForegroundColor Yellow}
         }
         if(-not $tools.Count){throw "No known tools were selected."}
-        $results=Invoke-MuxxToolCheck -Tools $tools -ResolveVersion -TimeoutSeconds 3
+        $results=Invoke-MuxxToolCheck -Tools $tools -ResolveVersion -ShowNext:(-not(Test-MuxxInteractive)) -TimeoutSeconds 3
     }
     $sw.Stop();Write-MuxxSummary $results $sw
     if(-not $all){Offer-MuxxInstallations $results}

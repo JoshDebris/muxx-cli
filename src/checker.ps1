@@ -76,30 +76,30 @@ function Find-MuxxToolLocations {
     }
 }
 function Write-MuxxToolResult {
-    param([object]$Result)
+    param([object]$Result,[bool]$ShowNext=$true)
     $detail=if($Result.Version){$Result.Version}else{$Result.Message}
     Write-MuxxStatus -Status $Result.Status -Name $Result.Name -Detail $detail
-    if($Result.Status -eq "NotInstalled"){
+    if($ShowNext -and $Result.Status -eq "NotInstalled"){
         Write-Host ""
         Write-Host "Next:" -ForegroundColor DarkGray
         Write-Host "  muxx install $($Result.Id)"
     }
 }
 function Invoke-MuxxToolCheck {
-    param([hashtable[]]$Tools,[switch]$ResolveVersion,[switch]$ShowProgress,[int]$TimeoutSeconds=3)
+    param([hashtable[]]$Tools,[switch]$ResolveVersion,[switch]$ShowProgress,[bool]$ShowNext=$true,[int]$TimeoutSeconds=3)
     $results=@();$i=0
     foreach($tool in $Tools){
         $i++
         if($ShowProgress){Write-Host ("[{0:D2}/{1:D2}] Checking {2}..." -f $i,$Tools.Count,$tool.Name) -ForegroundColor DarkGray}
         $r=Test-MuxxTool -Tool $tool -ResolveVersion:$ResolveVersion -TimeoutSeconds $TimeoutSeconds
         $results+=$r
-        if(-not $ShowProgress){Write-MuxxToolResult $r}
+        if(-not $ShowProgress){Write-MuxxToolResult -Result $r -ShowNext:$ShowNext}
     }
     if($ShowProgress){
         Write-Host ""
         foreach($cat in ($Tools.Category|Select-Object -Unique)){
             Write-MuxxSection $cat
-            foreach($r in ($results|Where-Object Category -eq $cat)){Write-MuxxToolResult $r}
+            foreach($r in ($results|Where-Object Category -eq $cat)){Write-MuxxToolResult -Result $r -ShowNext:$ShowNext}
             Write-Host ""
         }
     }
