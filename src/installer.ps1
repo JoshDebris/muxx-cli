@@ -4,45 +4,50 @@ function Install-MuxxWinget {
     Write-Host "MUXX can download the latest official Winget MSIX bundle from GitHub." -ForegroundColor Yellow
     if(-not(Read-MuxxYesNo "Install Winget now?")){return $false}
     $tmp=Join-Path $env:TEMP "muxx-winget.msixbundle"
+    $previousProgressPreference=$ProgressPreference
+    $ProgressPreference="SilentlyContinue"
     try{
-        Write-Host "Downloading Winget..." -ForegroundColor Cyan
+        Write-Host "Downloading Winget..." -ForegroundColor Yellow
         $release=Invoke-RestMethod -Uri "https://api.github.com/repos/microsoft/winget-cli/releases/latest" -UseBasicParsing
         $asset=$release.assets|Where-Object browser_download_url -match '\.msixbundle$'|Select-Object -First 1
         if(-not $asset){throw "No MSIX bundle found."}
         Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $tmp -UseBasicParsing
-        Write-Host "Installing Winget..." -ForegroundColor Cyan
+        Write-Host "Installing Winget..." -ForegroundColor Yellow
         Add-AppxPackage -Path $tmp
         return Test-MuxxWinget
     }catch{
         Write-MuxxError "Winget installation failed: $($_.Exception.Message)"
-        Write-Host "https://github.com/microsoft/winget-cli/releases" -ForegroundColor Cyan
+        Write-Host "https://github.com/microsoft/winget-cli/releases" -ForegroundColor DarkGray
         return $false
-    }finally{Remove-Item $tmp -Force -ErrorAction SilentlyContinue}
+    }finally{
+        $ProgressPreference=$previousProgressPreference
+        Remove-Item $tmp -Force -ErrorAction SilentlyContinue
+    }
 }
 function Install-MuxxTool {
     param([hashtable]$Tool)
     if(-not $Tool.WingetId){
         Write-Host "Please install $($Tool.Name) manually:" -ForegroundColor DarkGray
-        Write-Host $Tool.Website -ForegroundColor Cyan
+        Write-Host $Tool.Website -ForegroundColor DarkGray
         return $false
     }
     if(-not(Test-MuxxWinget)){
         Write-Host "❌ Winget is not available." -ForegroundColor Red
         if(-not(Install-MuxxWinget)){
             Write-Host "Please install $($Tool.Name) manually:" -ForegroundColor DarkGray
-            Write-Host $Tool.Website -ForegroundColor Cyan
+            Write-Host $Tool.Website -ForegroundColor DarkGray
             return $false
         }
     }
     $display="winget install --id $($Tool.WingetId) --exact --accept-package-agreements --accept-source-agreements"
     Write-Host "Recommended command:" -ForegroundColor DarkGray
-    Write-Host $display -ForegroundColor Cyan
+    Write-Host $display -ForegroundColor DarkGray
     if(-not(Read-MuxxYesNo "Install $($Tool.Name) now?")){return $false}
-    Write-Host "Installing $($Tool.Name)..." -ForegroundColor Cyan
+    Write-Host "Installing $($Tool.Name)..." -ForegroundColor Yellow
     $r=Invoke-MuxxProcess -FilePath "winget.exe" -Arguments @("install","--id",$Tool.WingetId,"--exact","--accept-package-agreements","--accept-source-agreements") -TimeoutSeconds 900
     if(-not $r.Success){
         Write-MuxxError "Installation failed."
-        Write-Host $Tool.Website -ForegroundColor Cyan
+        Write-Host $Tool.Website -ForegroundColor DarkGray
         return $false
     }
     Write-Host "Verifying installation..." -ForegroundColor DarkGray
