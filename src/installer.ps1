@@ -71,6 +71,11 @@ function Install-MuxxTool {
     Write-Host "Installing $($Tool.Name)..." -ForegroundColor Yellow
     $r=Invoke-MuxxInteractiveProcess -FilePath "winget.exe" -Arguments $wingetArgs
     if(-not $r.Success){
+        Write-Host "Retrying Winget search..." -ForegroundColor DarkGray
+        $fallbackArgs=@("install","--id",$wingetId,"--accept-package-agreements","--accept-source-agreements")
+        $r=Invoke-MuxxInteractiveProcess -FilePath "winget.exe" -Arguments $fallbackArgs
+    }
+    if(-not $r.Success){
         Write-Host "Installation failed." -ForegroundColor Red
         Write-Host ""
         Write-Host "$($Tool.Name) installation via Winget did not complete."
