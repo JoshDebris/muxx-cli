@@ -227,7 +227,7 @@ function Invoke-DoctorPowerShellSection {
     if ($isUtf8) {
         Add-DoctorPass "UTF-8 / Unicode console output available"
     } else {
-        Add-DoctorWarn "Console encoding is $($enc.EncodingName) (CodePage $($enc.CodePage)) — external tool output may require UTF-8"
+        Add-DoctorWarn "Console encoding is $($enc.EncodingName) (CodePage $($enc.CodePage)) - external tool output may require UTF-8"
     }
 }
 
