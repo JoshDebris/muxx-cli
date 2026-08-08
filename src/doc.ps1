@@ -1,7 +1,9 @@
 function Format-MuxxMdCell {
     param([string]$Value)
     if ([string]::IsNullOrEmpty($Value)) { return "" }
-    return ($Value -replace '\|', '\|').Trim()
+    $clean = ($Value -replace '[\x00-\x1F\x7F]', '').Trim()
+    if ([string]::IsNullOrWhiteSpace($clean)) { return "" }
+    return $clean -replace '\|', '\|'
 }
 
 function Invoke-MuxxDoc {
@@ -50,7 +52,8 @@ function Invoke-MuxxDoc {
             "NotInstalled" { "Not installed" }
             default        { "Warning" }
         }
-        $version = if ($r.Version) { $r.Version } else { "-" }
+        $vClean      = Format-MuxxMdCell $r.Version
+        $version     = if ($vClean) { $vClean } else { "-" }
         $nameCell    = Format-MuxxMdCell $r.Name
         $statusCell  = Format-MuxxMdCell $status
         $versionCell = Format-MuxxMdCell $version

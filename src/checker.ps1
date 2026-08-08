@@ -1,7 +1,8 @@
 function Get-MuxxVersion {
     param([string]$Output,[string]$Pattern)
-    if($Pattern -and $Output -match $Pattern){return $Matches[1].Trim()}
-    return Get-MuxxFirstLine $Output
+    $raw = if($Pattern -and $Output -match $Pattern){ $Matches[1] } else { Get-MuxxFirstLine $Output }
+    if(-not $raw){ return "" }
+    return ($raw -replace '[\x00-\x1F\x7F]', '').Trim()
 }
 function Test-MuxxTool {
     param([hashtable]$Tool,[switch]$ResolveVersion,[int]$TimeoutSeconds=3)
