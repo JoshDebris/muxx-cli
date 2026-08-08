@@ -1,4 +1,3 @@
-﻿#requires -version 5.1
 $dir=Join-Path $env:LOCALAPPDATA "MUXX"
 $parts=@([Environment]::GetEnvironmentVariable("Path","User") -split ";"|Where-Object{$_ -and $_ -ne $dir})
 [Environment]::SetEnvironmentVariable("Path",($parts -join ";"),"User")
