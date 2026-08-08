@@ -57,6 +57,27 @@ function Read-MuxxYesNo {
     if([string]::IsNullOrWhiteSpace($a)){return $DefaultYes}
     return $a.Trim().ToLowerInvariant() -in @("y","yes")
 }
+function Read-MuxxVersionChoice {
+    param([string]$ToolName,[array]$Versions)
+    if(-not(Test-MuxxInteractive)){return $Versions[0]}
+    Write-Host ""
+    Write-Host "Which version of $ToolName do you want to install?" -ForegroundColor Cyan
+    Write-Host ""
+    for($i=0;$i -lt $Versions.Count;$i++){
+        $label=$Versions[$i].Label
+        $suffix=if($i -eq 0){"  ← recommended"}else{""}
+        Write-Host ("  [{0}] {1}{2}" -f ($i+1),$label,$suffix)
+    }
+    Write-Host ""
+    $choice=Read-Host "Enter number [1]"
+    if([string]::IsNullOrWhiteSpace($choice)){return $Versions[0]}
+    $n=0
+    if([int]::TryParse($choice.Trim(),[ref]$n) -and $n -ge 1 -and $n -le $Versions.Count){
+        return $Versions[$n-1]
+    }
+    Write-Host "Invalid choice, using recommended version." -ForegroundColor Yellow
+    return $Versions[0]
+}
 function Get-MuxxSystemSummary {
     $os=Get-CimInstance Win32_OperatingSystem
     $cpu=Get-CimInstance Win32_Processor|Select-Object -First 1

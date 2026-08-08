@@ -58,7 +58,16 @@ function Install-MuxxTool {
             return $false
         }
     }
-    $wingetArgs=@("install","--id",$Tool.WingetId,"--exact","--source","winget","--accept-package-agreements","--accept-source-agreements")
+    $wingetId=$Tool.WingetId
+    if($Tool.ContainsKey("WingetVersions") -and $Tool.WingetVersions.Count -gt 0){
+        if($AssumeYes){
+            $wingetId=$Tool.WingetVersions[0].WingetId
+        }else{
+            $chosen=Read-MuxxVersionChoice -ToolName $Tool.Name -Versions $Tool.WingetVersions
+            $wingetId=$chosen.WingetId
+        }
+    }
+    $wingetArgs=@("install","--id",$wingetId,"--exact","--source","winget","--accept-package-agreements","--accept-source-agreements")
     $display="winget $((ConvertTo-MuxxArguments $wingetArgs))"
     Write-Host "Recommended command:" -ForegroundColor DarkGray
     Write-Host $display -ForegroundColor DarkGray
