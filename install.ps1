@@ -1,6 +1,6 @@
 $ErrorActionPreference="Stop"
 $Repository="JoshDebris/muxx-cli"
-$Branch="v1.0.0"
+$Branch="main"
 $previousProgressPreference=$ProgressPreference
 $ProgressPreference="SilentlyContinue"
 $dir=Join-Path $env:LOCALAPPDATA "MUXX"
