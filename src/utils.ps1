@@ -38,12 +38,16 @@ function Invoke-MuxxProcess {
 }
 function Invoke-MuxxInteractiveProcess {
     param([string]$FilePath,[string[]]$Arguments=@())
+    $prevEncoding=[Console]::OutputEncoding
     try{
+        [Console]::OutputEncoding=[System.Text.Encoding]::UTF8
         & $FilePath @Arguments|ForEach-Object{Write-Host $_}
         $exitCode=$LASTEXITCODE
         Write-Output -NoEnumerate ([pscustomobject]@{Success=($exitCode -eq 0);ExitCode=$exitCode;Error=""})
     }catch{
         Write-Output -NoEnumerate ([pscustomobject]@{Success=$false;ExitCode=$null;Error=$_.Exception.Message})
+    }finally{
+        [Console]::OutputEncoding=$prevEncoding
     }
 }
 function Test-MuxxInteractive {
