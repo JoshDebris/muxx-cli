@@ -1,4 +1,4 @@
-﻿function Get-MuxxToolRegistry {
+function Get-MuxxToolRegistry {
 @(
 @{Id="git";Name="Git";Category="Source Control";Command="git";Args=@("--version");Pattern="git version\s+([^\s]+)";WingetId="Git.Git";Website="https://git-scm.com/download/win";Quick=$true},
 @{Id="node";Aliases=@("nodejs");Name="Node.js";Category="JavaScript";Command="node";Args=@("--version");Pattern="v?([0-9][^\s]*)";WingetId="OpenJS.NodeJS.LTS";Website="https://nodejs.org/";Quick=$true},
@@ -6,10 +6,10 @@
 @{Id="python";Aliases=@("py");Name="Python";Category="Python";Command="python";Args=@("--version");Pattern="Python\s+([^\s]+)";WingetId="Python.Python.3.13";Website="https://www.python.org/downloads/windows/";Quick=$true},
 @{Id="php";Name="PHP";Category="PHP";Command="php";Args=@("--version");Pattern="PHP\s+([^\s]+)";WingetId="PHP.PHP.8.5";Website="https://windows.php.net/download/";Quick=$true},
 @{Id="composer";Name="Composer";Category="PHP";Command="composer";Args=@("--version");Pattern="Composer(?:\s+version)?\s+([^\s]+)";WingetId="Composer.Composer";Website="https://getcomposer.org/download/";Quick=$true},
-@{Id="rust";Aliases=@("rustc");Name="Rust";Category="Languages and SDKs";Command="rustc";Args=@("--version");Pattern="rustc\s+([^\s]+)";WingetId="Rustlang.Rustup";Website="https://rustup.rs/";Quick=$false},
-@{Id="cargo";Name="Cargo";Category="Languages and SDKs";Command="cargo";Args=@("--version");Pattern="cargo\s+([^\s]+)";WingetId="Rustlang.Rustup";Website="https://rustup.rs/";Quick=$false},
+@{Id="rust";Aliases=@("rustc");Name="Rust";Category="Languages and SDKs";Command="rustc";Args=@("--version");Pattern="rustc\s+([^\s]+)";WingetId="Rustlang.Rustup";Website="https://rustup.rs/";Quick=$false;TimeoutSeconds=8},
+@{Id="cargo";Name="Cargo";Category="Languages and SDKs";Command="cargo";Args=@("--version");Pattern="cargo\s+([^\s]+)";WingetId="Rustlang.Rustup";Website="https://rustup.rs/";Quick=$false;TimeoutSeconds=8},
 @{Id="go";Name="Go";Category="Languages and SDKs";Command="go";Args=@("version");Pattern="go version go([^\s]+)";WingetId="GoLang.Go";Website="https://go.dev/dl/";Quick=$false},
-@{Id="java";Name="Java";Category="Languages and SDKs";Command="java";Args=@("-version");Pattern='version\s+"([^"]+)"';WingetId="EclipseAdoptium.Temurin.21.JDK";Website="https://adoptium.net/";Quick=$false},
+@{Id="java";Name="Java";Category="Languages and SDKs";Command="java";Args=@("-version");Pattern='version\s+"([^"]+)"';WingetId="EclipseAdoptium.Temurin.21.JDK";Website="https://adoptium.net/";Quick=$false;TimeoutSeconds=8},
 @{Id="dotnet";Aliases=@(".net");Name=".NET SDK";Category="Languages and SDKs";Command="dotnet";Args=@("--version");Pattern="([0-9][^\s]*)";WingetId="Microsoft.DotNet.SDK.8";Website="https://dotnet.microsoft.com/download";Quick=$false},
 @{Id="docker";Name="Docker";Category="Containers";Command="docker";Args=@("--version");Pattern="Docker version\s+([^,\s]+)";WingetId="Docker.DockerDesktop";Website="https://www.docker.com/products/docker-desktop/";Quick=$false},
 @{Id="wsl";Name="WSL";Category="Containers";Command="wsl.exe";Args=@("--version");Pattern="(?:WSL-Version|WSL version):\s*([^\s]+)";WingetId="Microsoft.WSL";Website="https://learn.microsoft.com/windows/wsl/install";Quick=$false},

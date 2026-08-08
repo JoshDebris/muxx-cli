@@ -11,7 +11,8 @@ function Test-MuxxTool {
     }
     $status="Installed";$version="";$message=""
     if($ResolveVersion){
-        $r=Invoke-MuxxProcess -FilePath $cmd.Source -Arguments $Tool.Args -TimeoutSeconds $TimeoutSeconds
+        $effectiveTimeout=if($Tool.ContainsKey("TimeoutSeconds")){$Tool.TimeoutSeconds}else{$TimeoutSeconds}
+        $r=Invoke-MuxxProcess -FilePath $cmd.Source -Arguments $Tool.Args -TimeoutSeconds $effectiveTimeout
         if($r.TimedOut){$status="Warning";$message="Version check timed out"}
         elseif(-not $r.Success -and -not $r.Output){$status="Warning";$message="Version could not be read"}
         else{$version=Get-MuxxVersion $r.Output $Tool.Pattern}
