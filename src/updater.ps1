@@ -1,9 +1,10 @@
-function Get-MuxxLatestVersion {
+﻿function Get-MuxxLatestVersion {
     try {
-        $release = Invoke-RestMethod -Uri "https://api.github.com/repos/JoshDebris/muxx-cli/releases/latest" -UseBasicParsing -ErrorAction Stop
+        $headers = @{ "User-Agent" = "muxx-cli/$script:MuxxVersion" }
+        $release = Invoke-RestMethod -Uri "https://api.github.com/repos/JoshDebris/muxx-cli/releases/latest" -Headers $headers -UseBasicParsing -ErrorAction Stop
         return $release.tag_name -replace '^v', ''
     } catch {
-        throw "Could not reach GitHub to check for updates. Check your internet connection."
+        throw "Could not fetch latest version from GitHub: $($_.Exception.Message)"
     }
 }
 
