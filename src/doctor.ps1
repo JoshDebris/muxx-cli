@@ -220,12 +220,15 @@ function Invoke-DoctorPowerShellSection {
         Add-DoctorWarn "Could not read execution policy"
     }
 
-    # UTF-8 output encoding
-    $enc = [Console]::OutputEncoding
-    if ($enc.CodePage -eq 65001) {
-        Add-DoctorPass "UTF-8 console output available"
+    # UTF-8 / Unicode console output check
+    $isPSCore = $ver.Major -ge 6
+    $enc      = [Console]::OutputEncoding
+    $isUtf8   = ($enc.CodePage -eq 65001) -or ($OutputEncoding.CodePage -eq 65001) -or $isPSCore -or $env:WT_SESSION -or $env:CMDER_ROOT
+
+    if ($isUtf8) {
+        Add-DoctorPass "UTF-8 / Unicode console output available"
     } else {
-        Add-DoctorWarn "Console encoding is $($enc.EncodingName) — Unicode output may be garbled"
+        Add-DoctorWarn "Console encoding is $($enc.EncodingName) (CodePage $($enc.CodePage)) — external tool output may require UTF-8"
     }
 }
 
