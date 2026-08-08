@@ -14,6 +14,38 @@ function Show-MuxxHelp {
     $f=Join-Path $script:MuxxRoot "help.txt"
     if(Test-Path $f){Get-Content $f|ForEach-Object{Write-Host $_}}else{Write-MuxxError "help.txt is missing."}
 }
+function Show-MuxxInfo {
+    Write-MuxxHeader "Debug Info"
+    Write-MuxxSection "MUXX Installation"
+    Write-Host ("Version".PadRight(18)) -ForegroundColor DarkGray -NoNewline; Write-Host "v$script:MuxxVersion"
+    Write-Host ("Root".PadRight(18)) -ForegroundColor DarkGray -NoNewline; Write-Host $script:MuxxRoot
+    Write-Host ""
+    Write-MuxxSection "Source Files"
+    foreach($f in @("src\output.ps1","src\utils.ps1","src\registry.ps1","src\checker.ps1","src\installer.ps1","src\commands.ps1","help.txt")){
+        $path=Join-Path $script:MuxxRoot $f
+        $exists=Test-Path -LiteralPath $path
+        Write-Host ($f.PadRight(28)) -ForegroundColor DarkGray -NoNewline
+        if($exists){Write-Host "OK" -ForegroundColor Green}else{Write-Host "MISSING" -ForegroundColor Red}
+    }
+    Write-Host ""
+    Write-MuxxSection "PowerShell Environment"
+    Write-Host ("PS Version".PadRight(18)) -ForegroundColor DarkGray -NoNewline; Write-Host $PSVersionTable.PSVersion.ToString()
+    Write-Host ("PS Edition".PadRight(18)) -ForegroundColor DarkGray -NoNewline; Write-Host $PSVersionTable.PSEdition
+    try{
+        $policy=Get-ExecutionPolicy
+        Write-Host ("Exec Policy".PadRight(18)) -ForegroundColor DarkGray -NoNewline; Write-Host $policy
+    }catch{
+        Write-Host ("Exec Policy".PadRight(18)) -ForegroundColor DarkGray -NoNewline; Write-Host "unknown" -ForegroundColor Yellow
+    }
+    Write-Host ("Interactive".PadRight(18)) -ForegroundColor DarkGray -NoNewline; Write-Host (Test-MuxxInteractive)
+    Write-Host ""
+    Write-MuxxSection "PATH"
+    $pathEntries=@($env:Path -split ";" | Where-Object{$_})
+    $muxxInPath=$pathEntries -contains $script:MuxxRoot
+    Write-Host ("MUXX in PATH".PadRight(18)) -ForegroundColor DarkGray -NoNewline
+    if($muxxInPath){Write-Host "Yes" -ForegroundColor Green}else{Write-Host "No" -ForegroundColor Yellow}
+    Write-Host ("PATH entries".PadRight(18)) -ForegroundColor DarkGray -NoNewline; Write-Host $pathEntries.Count
+}
 function Invoke-MuxxInstallCommand {
     param([string[]]$Arguments)
     $ids=@($Arguments|Where-Object{$_ -and -not $_.StartsWith("-")})
@@ -126,6 +158,8 @@ function Invoke-MuxxCommand {
         "version"{Write-Host "MUXX-CLI v$script:MuxxVersion"}
         "--version"{Write-Host "MUXX-CLI v$script:MuxxVersion"}
         "-v"{Write-Host "MUXX-CLI v$script:MuxxVersion"}
+        "info"{Show-MuxxInfo}
+        "--info"{Show-MuxxInfo}
         default{throw "Unknown command: $Command. Run 'muxx help'."}
     }
 }
