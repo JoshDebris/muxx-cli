@@ -57,6 +57,7 @@ function Invoke-MuxxUpdate {
             $target = Join-Path $dir ($f -replace '/', '\')
             New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force | Out-Null
             Invoke-WebRequest -Uri "$base/$($f)?cb=$cacheBust" -OutFile $target -UseBasicParsing -ErrorAction Stop
+            Unblock-File -LiteralPath $target -ErrorAction SilentlyContinue
         }
     } catch {
         throw "Update failed while downloading files: $($_.Exception.Message)"

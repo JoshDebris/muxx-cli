@@ -27,6 +27,7 @@ try{
         $target=Join-Path $dir $f.Target
         New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force|Out-Null
         Invoke-WebRequest -Uri "$base/$($f.Source)?cb=$cacheBust" -OutFile $target -UseBasicParsing
+        Unblock-File -LiteralPath $target -ErrorAction SilentlyContinue
     }
 }finally{
     $ProgressPreference=$previousProgressPreference
