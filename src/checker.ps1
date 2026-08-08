@@ -82,9 +82,8 @@ function Write-MuxxToolResult {
     $detail=if($Result.Version){$Result.Version}else{$Result.Message}
     Write-MuxxStatus -Status $Result.Status -Name $Result.Name -Detail $detail
     if($ShowNext -and $Result.Status -eq "NotInstalled"){
+        Write-Host "Next: muxx install $($Result.Id)" -ForegroundColor DarkGray
         Write-Host ""
-        Write-Host "Next:" -ForegroundColor DarkGray
-        Write-Host "  muxx install $($Result.Id)"
     }
 }
 function Invoke-MuxxToolCheck {
