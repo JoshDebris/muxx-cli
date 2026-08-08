@@ -16,6 +16,8 @@ $files=@(
     @{Source="src/checker.ps1";Target="src/checker.ps1"},
     @{Source="src/installer.ps1";Target="src/installer.ps1"},
     @{Source="src/updater.ps1";Target="src/updater.ps1"},
+    @{Source="src/doc.ps1";Target="src/doc.ps1"},
+    @{Source="src/doctor.ps1";Target="src/doctor.ps1"},
     @{Source="src/commands.ps1";Target="src/commands.ps1"}
 )
 try{

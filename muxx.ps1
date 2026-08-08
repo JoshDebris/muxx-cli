@@ -9,7 +9,7 @@ $ErrorActionPreference = "Stop"
 $script:MuxxRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $script:MuxxVersion = "1.0.0"
 
-@("output","utils","registry","checker","installer","updater","commands") | ForEach-Object {
+@("output","utils","registry","checker","installer","updater","doc","doctor","commands") | ForEach-Object {
     $file = Join-Path $script:MuxxRoot "src\$_.ps1"
     if (-not (Test-Path -LiteralPath $file)) { throw "Required MUXX file is missing: $file" }
     . $file

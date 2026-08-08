@@ -151,7 +151,8 @@ function Invoke-MuxxCommand {
         "check"{Invoke-MuxxCheckCommand $Arguments}
         "install"{Invoke-MuxxInstallCommand $Arguments}
         "update"{Invoke-MuxxUpdate}
-        "doc"{Invoke-MuxxCheckCommand (@("--all")+$Arguments)}
+        "doc"{Invoke-MuxxDoc}
+        "doctor"{Invoke-MuxxDoctor}
         "where"{Invoke-MuxxWhereCommand $Arguments}
         "help"{Show-MuxxHelp}
         "--help"{Show-MuxxHelp}

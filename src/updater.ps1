@@ -1,4 +1,4 @@
-﻿function Get-MuxxLatestVersion {
+function Get-MuxxLatestVersion {
     try {
         $headers = @{ "User-Agent" = "muxx-cli/$script:MuxxVersion" }
         $release = Invoke-RestMethod -Uri "https://api.github.com/repos/JoshDebris/muxx-cli/releases/latest" -Headers $headers -UseBasicParsing -ErrorAction Stop
@@ -24,6 +24,8 @@ function Invoke-MuxxUpdate {
         "src/checker.ps1",
         "src/installer.ps1",
         "src/updater.ps1",
+        "src/doc.ps1",
+        "src/doctor.ps1",
         "src/commands.ps1"
     )
 
