@@ -1,0 +1,20 @@
+MUXX-CLI v1.0.0
+
+Usage:
+  muxx                  Run quick environment check
+  muxx check <tool...>  Check one or more specific tools
+  muxx check --all      Check all known tools
+  muxx install <tool>   Install a missing tool via Winget
+  muxx where <tool>     Show tool location and PATH info
+  muxx doc              Full environment report (same as check --all)
+  muxx version          Show MUXX-CLI version
+  muxx help             Show this help
+
+Quick-check tools (shown by default):
+  git node npm python php composer code winget curl
+
+All available tools:
+  git node npm python php composer
+  rust cargo go java dotnet
+  docker wsl
+  code winget curl ffmpeg imagemagick jq ripgrep fd bat fzf
