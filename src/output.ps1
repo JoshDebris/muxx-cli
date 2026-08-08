@@ -1,4 +1,4 @@
-﻿function Write-MuxxRule {
+function Write-MuxxRule {
     param([int]$Length=64,[char]$Character='-')
     Write-Host ($Character.ToString() * $Length) -ForegroundColor DarkGray
 }
@@ -9,9 +9,12 @@ function Write-MuxxHeader {
     Write-Host $Subtitle -ForegroundColor DarkGray
     Write-Host ""
 }
+$script:_MuxxSymPass = [char]0x2713
+$script:_MuxxSymFail = [char]0x2717
+
 function Write-MuxxChecking {
     param([string]$Suffix="")
-    $text="muxx is checking... 🤓"
+    $text="muxx is checking..."
     if ($Suffix) { $text += "  $Suffix" }
     Write-Host $text -ForegroundColor DarkGray
     Write-Host ""
@@ -26,17 +29,17 @@ function Write-MuxxStatus {
     $label=$Name.PadRight(18)
     switch ($Status) {
         "Installed" {
-            Write-Host "✅ " -NoNewline
+            Write-Host "$($script:_MuxxSymPass) " -ForegroundColor Green -NoNewline
             Write-Host $label -NoNewline
             Write-Host "Installed" -ForegroundColor Green -NoNewline
         }
         "NotInstalled" {
-            Write-Host "❌ " -NoNewline
+            Write-Host "$($script:_MuxxSymFail) " -ForegroundColor Red -NoNewline
             Write-Host $label -ForegroundColor DarkGray -NoNewline
             Write-Host "Not installed" -ForegroundColor Red -NoNewline
         }
         default {
-            Write-Host "⚠️  " -NoNewline
+            Write-Host "! " -ForegroundColor Yellow -NoNewline
             Write-Host $label -NoNewline
             Write-Host "Warning" -ForegroundColor Yellow -NoNewline
         }

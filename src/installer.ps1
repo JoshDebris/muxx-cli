@@ -72,7 +72,7 @@ function Install-MuxxTool {
         }
     }
     if(-not(Test-MuxxWinget)){
-        Write-Host "❌ Winget is not available." -ForegroundColor Red
+        Write-Host "✗ Winget is not available." -ForegroundColor Red
         if(-not(Install-MuxxWinget -AssumeYes:$AssumeYes)){
             Write-Host "Please install $($Tool.Name) manually:" -ForegroundColor DarkGray
             Write-Host $Tool.Website -ForegroundColor DarkGray

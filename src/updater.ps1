@@ -39,8 +39,9 @@ function Invoke-MuxxUpdate {
     Write-Host "v$latest"
     Write-Host ""
 
+    $pass = [char]0x2713
     if ($current -eq $latest) {
-        Write-Host "✅ Already up to date." -ForegroundColor Green
+        Write-Host "$pass Already up to date." -ForegroundColor Green
         return
     }
 
@@ -65,7 +66,7 @@ function Invoke-MuxxUpdate {
         $ProgressPreference = $prevProgress
     }
 
-    Write-Host "✅ Files updated" -ForegroundColor Green
+    Write-Host "$pass Files updated" -ForegroundColor Green
     Write-Host ""
     Write-Host "MUXX-CLI updated to v$latest" -ForegroundColor Cyan
     Write-Host "Open a new terminal to use the updated version." -ForegroundColor DarkGray

@@ -54,7 +54,7 @@ function Invoke-MuxxInstallCommand {
     foreach($id in $ids){
         $tool=Find-MuxxTool $id
         if(-not $tool){
-            Write-Host "⚠️  Unknown tool: $id" -ForegroundColor Yellow
+            Write-Host "!  Unknown tool: $id" -ForegroundColor Yellow
             $completed=$false
             continue
         }
@@ -95,7 +95,7 @@ function Invoke-MuxxCheckCommand {
         $tools=@()
         foreach($id in $ids){
             $t=Find-MuxxTool $id
-            if($t){$tools+=$t}else{Write-Host "⚠️  Unknown tool: $id" -ForegroundColor Yellow}
+            if($t){$tools+=$t}else{Write-Host "!  Unknown tool: $id" -ForegroundColor Yellow}
         }
         if(-not $tools.Count){throw "No known tools were selected."}
         $results=Invoke-MuxxToolCheck -Tools $tools -ResolveVersion -ShowNext:(-not(Test-MuxxInteractive)) -TimeoutSeconds 3
@@ -121,25 +121,23 @@ function Invoke-MuxxWhereCommand {
         Write-Host $tool.Name
         Write-Host ""
         if($locations.Found.Count){
-            Write-Host "⚠️  Found outside PATH" -ForegroundColor Yellow
+            Write-Host "!  Found outside PATH" -ForegroundColor Yellow
             Write-Host ""
             Write-Host "Locations:" -ForegroundColor DarkGray
             foreach($found in $locations.Found){
                 Write-Host "- $($found.Path)"
             }
             Write-Host ""
-            Write-Host "Next:" -ForegroundColor DarkGray
-            Write-Host "  Add the directory to PATH, then open a new terminal."
+            Write-Host "Next: Add the directory to PATH, then open a new terminal." -ForegroundColor DarkGray
         }else{
-            Write-Host "❌ Not installed" -ForegroundColor Red
+            Write-Host "✗ Not installed" -ForegroundColor Red
             Write-Host ""
             Write-Host "Search paths checked:" -ForegroundColor DarkGray
             foreach($source in $locations.Checked){
                 Write-Host "- $source"
             }
             Write-Host ""
-            Write-Host "Install:" -ForegroundColor DarkGray
-            Write-Host "  muxx install $($tool.Id)"
+            Write-Host "Next: muxx install $($tool.Id)" -ForegroundColor DarkGray
         }
     }
 }

@@ -41,5 +41,6 @@ $sessionParts=@($env:Path -split ";"|Where-Object{$_})
 if($sessionParts -notcontains $dir){
     $env:Path=(($sessionParts+$dir)|Select-Object -Unique)-join ";"
 }
-Write-Host "✅ MUXX-CLI installed." -ForegroundColor Green
+$pass=[char]0x2713
+Write-Host "$pass MUXX-CLI installed." -ForegroundColor Green
 Write-Host "Run: muxx" -ForegroundColor DarkGray
