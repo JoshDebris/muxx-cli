@@ -211,8 +211,7 @@ function Invoke-DoctorPowerShellSection {
         $policy     = Get-ExecutionPolicy
         $restricted = @("Restricted", "AllSigned")
         if ($restricted -contains $policy) {
-            Add-DoctorFail "Execution policy is $policy — MUXX scripts may be blocked" `
-                "Set-ExecutionPolicy RemoteSigned -Scope CurrentUser"
+            Add-DoctorFail "Execution policy is $policy - MUXX scripts may be blocked" "Set-ExecutionPolicy RemoteSigned -Scope CurrentUser"
         } else {
             Add-DoctorPass "Execution policy allows MUXX ($policy)"
         }
@@ -268,8 +267,7 @@ function Invoke-DoctorMuxxSection {
     # GitHub API reachable
     try {
         $headers = @{ "User-Agent" = "muxx-cli/$($script:MuxxVersion)" }
-        $null = Invoke-RestMethod -Uri "https://api.github.com/repos/JoshDebris/muxx-cli/releases/latest" `
-            -Headers $headers -UseBasicParsing -ErrorAction Stop
+        $null = Invoke-RestMethod -Uri "https://api.github.com/repos/JoshDebris/muxx-cli/releases/latest" -Headers $headers -UseBasicParsing -ErrorAction Stop
         Add-DoctorPass "Update check reachable"
     } catch {
         Add-DoctorWarn "Update check not reachable (GitHub API)"
