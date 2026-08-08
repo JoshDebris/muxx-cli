@@ -21,7 +21,7 @@ function Show-MuxxInfo {
     Write-Host ("Root".PadRight(18)) -ForegroundColor DarkGray -NoNewline; Write-Host $script:MuxxRoot
     Write-Host ""
     Write-MuxxSection "Source Files"
-    foreach($f in @("src\output.ps1","src\utils.ps1","src\registry.ps1","src\checker.ps1","src\installer.ps1","src\commands.ps1","help.txt")){
+    foreach($f in @("src\output.ps1","src\utils.ps1","src\registry.ps1","src\checker.ps1","src\installer.ps1","src\updater.ps1","src\commands.ps1","help.txt")){
         $path=Join-Path $script:MuxxRoot $f
         $exists=Test-Path -LiteralPath $path
         Write-Host ($f.PadRight(28)) -ForegroundColor DarkGray -NoNewline
@@ -150,6 +150,7 @@ function Invoke-MuxxCommand {
         ""{Invoke-MuxxQuickCheck}
         "check"{Invoke-MuxxCheckCommand $Arguments}
         "install"{Invoke-MuxxInstallCommand $Arguments}
+        "update"{Invoke-MuxxUpdate}
         "doc"{Invoke-MuxxCheckCommand (@("--all")+$Arguments)}
         "where"{Invoke-MuxxWhereCommand $Arguments}
         "help"{Show-MuxxHelp}

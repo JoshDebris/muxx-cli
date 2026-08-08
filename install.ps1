@@ -15,6 +15,7 @@ $files=@(
     @{Source="src/registry.ps1";Target="src/registry.ps1"},
     @{Source="src/checker.ps1";Target="src/checker.ps1"},
     @{Source="src/installer.ps1";Target="src/installer.ps1"},
+    @{Source="src/updater.ps1";Target="src/updater.ps1"},
     @{Source="src/commands.ps1";Target="src/commands.ps1"}
 )
 try{

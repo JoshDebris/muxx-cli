@@ -5,6 +5,7 @@ Usage:
   muxx check <tool...>  Check one or more specific tools
   muxx check --all      Check all known tools
   muxx install <tool>   Install a missing tool via Winget
+  muxx update           Update MUXX-CLI to the latest version
   muxx where <tool>     Show tool location and PATH info
   muxx doc              Full environment report (same as check --all)
   muxx info             Show debug info (version, files, PATH, PS version)
