@@ -53,7 +53,9 @@ function Install-MuxxTool {
                     Invoke-WebRequest -Uri "https://getcomposer.org/Composer-Setup.exe" -OutFile $setup -UseBasicParsing
                     Write-Host "Running Composer-Setup.exe..." -ForegroundColor Yellow
                     $proc = Start-Process -FilePath $setup -Wait -PassThru
-                    return ($proc.ExitCode -eq 0)
+                    if($proc.ExitCode -ne 0){ return $false }
+                    # Refresh session PATH from User & Machine environment to catch new PATH additions
+                    $env:Path = ([Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User"))
                 }catch{
                     Write-Host "Composer installation failed: $($_.Exception.Message)" -ForegroundColor Red
                     Write-Host "Please download manually: https://getcomposer.org/download/" -ForegroundColor DarkGray
@@ -65,9 +67,9 @@ function Install-MuxxTool {
             default {
                 Write-Host "Please install $($Tool.Name) manually:" -ForegroundColor DarkGray
                 Write-Host $Tool.Website -ForegroundColor DarkGray
+                return $false
             }
         }
-        return $false
     }
     if(-not(Test-MuxxWinget)){
         Write-Host "❌ Winget is not available." -ForegroundColor Red
