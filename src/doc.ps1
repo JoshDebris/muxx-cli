@@ -1,3 +1,9 @@
+function Format-MuxxMdCell {
+    param([string]$Value)
+    if ([string]::IsNullOrEmpty($Value)) { return "" }
+    return ($Value -replace '\|', '\|').Trim()
+}
+
 function Invoke-MuxxDoc {
     param([string]$OutputPath = "")
 
@@ -16,20 +22,22 @@ function Invoke-MuxxDoc {
     $date = Get-Date -Format "yyyy-MM-dd HH:mm"
     $sb   = [System.Text.StringBuilder]::new()
 
+    $winTitle = Format-MuxxMdCell $sys.Windows
+
     [void]$sb.AppendLine("# Environment Report")
     [void]$sb.AppendLine("")
-    [void]$sb.AppendLine("Generated: $date | MUXX-CLI v$($script:MuxxVersion) | $($sys.Windows)")
+    [void]$sb.AppendLine("Generated: $date | MUXX-CLI v$($script:MuxxVersion) | $winTitle")
     [void]$sb.AppendLine("")
     [void]$sb.AppendLine("## System")
     [void]$sb.AppendLine("")
     [void]$sb.AppendLine("| | |")
     [void]$sb.AppendLine("|---|---|")
-    [void]$sb.AppendLine("| CPU | $($sys.CPU) |")
-    [void]$sb.AppendLine("| Memory | $($sys.Memory) |")
-    [void]$sb.AppendLine("| Uptime | $($sys.Uptime) |")
-    [void]$sb.AppendLine("| Host | $($sys.Host) |")
-    [void]$sb.AppendLine("| User | $($sys.User) |")
-    [void]$sb.AppendLine("| PowerShell | v$($sys.PowerShell) |")
+    [void]$sb.AppendLine("| CPU | $(Format-MuxxMdCell $sys.CPU) |")
+    [void]$sb.AppendLine("| Memory | $(Format-MuxxMdCell $sys.Memory) |")
+    [void]$sb.AppendLine("| Uptime | $(Format-MuxxMdCell $sys.Uptime) |")
+    [void]$sb.AppendLine("| Host | $(Format-MuxxMdCell $sys.Host) |")
+    [void]$sb.AppendLine("| User | $(Format-MuxxMdCell $sys.User) |")
+    [void]$sb.AppendLine("| PowerShell | v$(Format-MuxxMdCell $sys.PowerShell) |")
     [void]$sb.AppendLine("")
     [void]$sb.AppendLine("## Tools")
     [void]$sb.AppendLine("")
@@ -43,7 +51,10 @@ function Invoke-MuxxDoc {
             default        { "Warning" }
         }
         $version = if ($r.Version) { $r.Version } else { "-" }
-        [void]$sb.AppendLine("| $($r.Name) | $status | $version |")
+        $nameCell    = Format-MuxxMdCell $r.Name
+        $statusCell  = Format-MuxxMdCell $status
+        $versionCell = Format-MuxxMdCell $version
+        [void]$sb.AppendLine("| $nameCell | $statusCell | $versionCell |")
     }
 
     $ok    = @($results | Where-Object Status -eq "Installed").Count
