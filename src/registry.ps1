@@ -19,7 +19,7 @@ function Get-MuxxToolRegistry {
     @{Label="PHP 8.0";WingetId="PHP.PHP.8.0"},
     @{Label="PHP 7.4";WingetId="PHP.PHP.7.4"}
 );Website="https://windows.php.net/download/";Quick=$true},
-@{Id="composer";Name="Composer";Category="PHP";Command="composer";Args=@("--version");Pattern="Composer(?:\s+version)?\s+([^\s]+)";WingetId="Composer.Composer";Website="https://getcomposer.org/download/";Quick=$true},
+@{Id="composer";Name="Composer";Category="PHP";Command="composer";Args=@("--version");Pattern="Composer(?:\s+version)?\s+([^\s]+)";WingetId="";Website="https://getcomposer.org/download/";Quick=$true},
 @{Id="rust";Aliases=@("rustc");Name="Rust";Category="Languages and SDKs";Command="rustc";Args=@("--version");Pattern="rustc\s+([^\s]+)";WingetId="Rustlang.Rustup";Website="https://rustup.rs/";Quick=$false;TimeoutSeconds=8},
 @{Id="cargo";Name="Cargo";Category="Languages and SDKs";Command="cargo";Args=@("--version");Pattern="cargo\s+([^\s]+)";WingetId="Rustlang.Rustup";Website="https://rustup.rs/";Quick=$false;TimeoutSeconds=8},
 @{Id="go";Name="Go";Category="Languages and SDKs";Command="go";Args=@("version");Pattern="go version go([^\s]+)";WingetId="GoLang.Go";Website="https://go.dev/dl/";Quick=$false},
