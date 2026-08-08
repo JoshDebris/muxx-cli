@@ -18,6 +18,7 @@ function Invoke-MuxxUpdate {
         "muxx.ps1",
         "muxx.cmd",
         "help.txt",
+        "uninstall.ps1",
         "src/output.ps1",
         "src/utils.ps1",
         "src/registry.ps1",

@@ -10,6 +10,7 @@ $files=@(
     @{Source="muxx.ps1";Target="muxx.ps1"},
     @{Source="muxx.cmd";Target="muxx.cmd"},
     @{Source="help.txt";Target="help.txt"},
+    @{Source="uninstall.ps1";Target="uninstall.ps1"},
     @{Source="src/output.ps1";Target="src/output.ps1"},
     @{Source="src/utils.ps1";Target="src/utils.ps1"},
     @{Source="src/registry.ps1";Target="src/registry.ps1"},

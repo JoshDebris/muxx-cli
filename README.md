@@ -10,8 +10,9 @@ MUXX first. Fancy later.
 muxx
 muxx check php node composer
 muxx install php
-muxx check --all
+muxx update
 muxx doc
+muxx doctor
 muxx where php
 muxx help
 ```
@@ -20,6 +21,12 @@ muxx help
 
 ```powershell
 iex (irm https://raw.githubusercontent.com/JoshDebris/muxx-cli/main/install.ps1)
+```
+
+## Uninstall
+
+```powershell
+iex (irm https://raw.githubusercontent.com/JoshDebris/muxx-cli/main/uninstall.ps1)
 ```
 
 ## Design Principles
