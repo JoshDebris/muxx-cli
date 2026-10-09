@@ -60,6 +60,10 @@ function Invoke-MuxxInstallCommand {
         }
         $current=Test-MuxxTool -Tool $tool -ResolveVersion -TimeoutSeconds 3
         if($current.Installed){
+            if($current.Status -eq "Warning"){
+                if(-not(Confirm-MuxxToolInstallation -Tool $tool)){$completed=$false}
+                continue
+            }
             Write-MuxxToolResult $current
             continue
         }
@@ -116,6 +120,10 @@ function Invoke-MuxxWhereCommand {
         Write-Host "";Write-MuxxSection "Location"
         Write-Host ("Executable".PadRight(18)) -ForegroundColor DarkGray -NoNewline;Write-Host $r.Path
         Write-Host ("PATH entry".PadRight(18)) -ForegroundColor DarkGray -NoNewline;Write-Host (Split-Path -Parent $r.Path)
+        if($r.Status -eq "Warning"){
+            Write-Host ""
+            Write-Host "Next: Add this directory to PATH, then open a new terminal." -ForegroundColor DarkGray
+        }
     }else{
         $locations=Find-MuxxToolLocations -Tool $tool
         Write-Host $tool.Name

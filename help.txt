@@ -1,4 +1,4 @@
-MUXX-CLI v1.0.1
+MUXX-CLI v1.0.2
 
 Usage:
   muxx                  Run quick environment check
@@ -14,10 +14,12 @@ Usage:
   muxx help             Show this help
 
 Quick-check tools (shown by default):
-  git node npm python php composer code winget curl
+  git node npm python pip uv php composer cmake code winget curl
 
 All available tools:
-  git node npm python php composer
+  git node npm python pip pipx uv poetry php composer
   rust cargo go java dotnet
+  cmake ninja make msbuild gcc clang
   docker wsl
-  code winget curl ffmpeg imagemagick jq ripgrep fd bat fzf
+  code winget choco scoop
+  curl ffmpeg imagemagick jq ripgrep fd bat fzf

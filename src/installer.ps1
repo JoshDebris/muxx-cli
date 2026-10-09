@@ -1,4 +1,18 @@
 function Test-MuxxWinget { return $null -ne (Get-Command winget.exe -ErrorAction SilentlyContinue|Select-Object -First 1) }
+function Confirm-MuxxToolInstallation {
+    param([hashtable]$Tool)
+    $installed=Test-MuxxTool -Tool $Tool -ResolveVersion -TimeoutSeconds 5
+    if(-not $installed.Installed){return $false}
+    if($installed.Status -eq "Warning" -and $installed.Path){
+        $toolDir=Split-Path -Parent $installed.Path
+        if(Add-MuxxUserPathEntry -Path $toolDir){
+            $installed=Test-MuxxTool -Tool $Tool -ResolveVersion -TimeoutSeconds 5
+            Write-Host "Added tool directory to your user PATH. Open a new terminal to use it." -ForegroundColor Yellow
+        }
+    }
+    Write-MuxxToolResult $installed
+    return $true
+}
 function Install-MuxxWinget {
     param([switch]$AssumeYes)
     Write-Host ""
@@ -57,9 +71,8 @@ function Install-MuxxTool {
                     $proc = Start-Process -FilePath $setup -Wait -PassThru
                     if($proc.ExitCode -ne 0){ return $false }
                     # Refresh session PATH from User & Machine environment to catch new PATH additions
-                    $env:Path = ([Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User"))
-                    $installed=Test-MuxxTool -Tool $Tool -ResolveVersion -TimeoutSeconds 5
-                    if($installed.Installed){Write-MuxxToolResult $installed;return $true}
+                    Update-MuxxSessionPath
+                    if(Confirm-MuxxToolInstallation -Tool $Tool){return $true}
                     Write-Host "Installed, but not visible in this terminal yet. Open a new terminal." -ForegroundColor Yellow
                     return $true
                 }catch{
@@ -97,6 +110,16 @@ function Install-MuxxTool {
     if(-not $AssumeYes -and -not(Read-MuxxYesNo "Install $($Tool.Name) now?")){return $false}
     Write-Host "Installing $($Tool.Name)..." -ForegroundColor Yellow
     $r=Invoke-MuxxInteractiveProcess -FilePath "winget.exe" -Arguments $wingetArgs
+    if(-not $r.Success -and $r.ExitCode -eq -1978335189){
+        # 0x8A15002B: package is already installed and no upgrade is available.
+        Update-MuxxSessionPath
+        if(Confirm-MuxxToolInstallation -Tool $Tool){return $true}
+        Write-Host "Winget has a stale registration for $($Tool.Name). Repairing..." -ForegroundColor Yellow
+        $repairArgs=$wingetArgs+@("--force")
+        Write-Host "Repair command:" -ForegroundColor DarkGray
+        Write-Host "winget $((ConvertTo-MuxxArguments $repairArgs))" -ForegroundColor DarkGray
+        $r=Invoke-MuxxInteractiveProcess -FilePath "winget.exe" -Arguments $repairArgs
+    }
     if(-not $r.Success){
         Write-Host "Retrying Winget search..." -ForegroundColor DarkGray
         $fallbackArgs=@("install","--id",$wingetId,"--accept-package-agreements","--accept-source-agreements")
@@ -115,8 +138,7 @@ function Install-MuxxTool {
         return $false
     }
     Write-Host "Verifying installation..." -ForegroundColor DarkGray
-    $v=Test-MuxxTool -Tool $Tool -ResolveVersion -TimeoutSeconds 5
-    if($v.Installed){Write-MuxxToolResult $v;return $true}
+    if(Confirm-MuxxToolInstallation -Tool $Tool){return $true}
     Write-Host "Installed, but not visible in this terminal yet. Open a new terminal." -ForegroundColor Yellow
     return $false
 }

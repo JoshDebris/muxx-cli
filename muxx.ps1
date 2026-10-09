@@ -7,7 +7,7 @@ param(
 Set-StrictMode -Version 2.0
 $ErrorActionPreference = "Stop"
 $script:MuxxRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$script:MuxxVersion = "1.0.1"
+$script:MuxxVersion = "1.0.2"
 
 @("output","utils","registry","checker","installer","updater","doc","doctor","commands") | ForEach-Object {
     $file = Join-Path $script:MuxxRoot "src\$_.ps1"

@@ -4,13 +4,39 @@ function Get-MuxxVersion {
     if(-not $raw){ return "" }
     return ($raw -replace '[\x00-\x1F\x7F]', '').Trim()
 }
+function Resolve-MuxxToolCommand {
+    param([hashtable]$Tool)
+    $cmd=Get-Command $Tool.Command -ErrorAction SilentlyContinue|Select-Object -First 1
+    if($cmd){return [pscustomobject]@{Source=$cmd.Source;OnPath=$true}}
+
+    $wingetLinks=Join-Path $env:LOCALAPPDATA "Microsoft\WinGet\Links"
+    $names=@($Tool.Command)
+    if(-not [IO.Path]::GetExtension($Tool.Command)){$names+=@("$($Tool.Command).exe","$($Tool.Command).cmd")}
+    foreach($name in $names){
+        $candidate=Join-Path $wingetLinks $name
+        if(Test-Path -LiteralPath $candidate){return [pscustomobject]@{Source=$candidate;OnPath=$false}}
+    }
+
+    if($Tool.WingetId){
+        $wingetPackages=Join-Path $env:LOCALAPPDATA "Microsoft\WinGet\Packages"
+        $packageDirs=@(Get-ChildItem -LiteralPath $wingetPackages -Directory -Filter "$($Tool.WingetId)_*" -ErrorAction SilentlyContinue)
+        $commandBase=[IO.Path]::GetFileNameWithoutExtension($Tool.Command)
+        foreach($packageDir in $packageDirs){
+            $candidate=Get-ChildItem -LiteralPath $packageDir.FullName -File -Filter "$commandBase*.exe" -Recurse -ErrorAction SilentlyContinue|Select-Object -First 1
+            if($candidate){return [pscustomobject]@{Source=$candidate.FullName;OnPath=$false}}
+        }
+    }
+    return $null
+}
 function Test-MuxxTool {
     param([hashtable]$Tool,[switch]$ResolveVersion,[int]$TimeoutSeconds=3)
-    $cmd=Get-Command $Tool.Command -ErrorAction SilentlyContinue|Select-Object -First 1
+    $cmd=Resolve-MuxxToolCommand -Tool $Tool
     if(-not $cmd){
         return [pscustomobject]@{Id=$Tool.Id;Name=$Tool.Name;Category=$Tool.Category;Status="NotInstalled";Installed=$false;Version="";Path="";Message="";Tool=$Tool}
     }
-    $status="Installed";$version="";$message=""
+    $status=if($cmd.OnPath){"Installed"}else{"Warning"}
+    $version=""
+    $message=if($cmd.OnPath){""}else{"Installed, but not on PATH"}
     if($ResolveVersion){
         $effectiveTimeout=if($Tool.ContainsKey("TimeoutSeconds")){$Tool.TimeoutSeconds}else{$TimeoutSeconds}
         $r=Invoke-MuxxProcess -FilePath $cmd.Source -Arguments $Tool.Args -TimeoutSeconds $effectiveTimeout
@@ -22,10 +48,10 @@ function Test-MuxxTool {
 }
 function Find-MuxxToolLocations {
     param([hashtable]$Tool)
-    $checked=@("PATH")
+    $checked=@("PATH","Winget links","Winget package directories")
     $found=@()
-    $cmd=Get-Command $Tool.Command -ErrorAction SilentlyContinue|Select-Object -First 1
-    if($cmd){$found+=[pscustomobject]@{Source="PATH";Path=$cmd.Source}}
+    $cmd=Resolve-MuxxToolCommand -Tool $Tool
+    if($cmd){$found+=[pscustomobject]@{Source=$(if($cmd.OnPath){"PATH"}else{"Winget links"});Path=$cmd.Source}}
 
     $checked+="Registry"
     $registryRoots=@(
@@ -79,7 +105,7 @@ function Find-MuxxToolLocations {
 }
 function Write-MuxxToolResult {
     param([object]$Result,[bool]$ShowNext=$true)
-    $detail=if($Result.Version){$Result.Version}else{$Result.Message}
+    $detail=if($Result.Version -and $Result.Message){"$($Result.Version) | $($Result.Message)"}elseif($Result.Version){$Result.Version}else{$Result.Message}
     Write-MuxxStatus -Status $Result.Status -Name $Result.Name -Detail $detail
     if($ShowNext -and $Result.Status -eq "NotInstalled"){
         Write-Host "Next: muxx install $($Result.Id)" -ForegroundColor DarkGray

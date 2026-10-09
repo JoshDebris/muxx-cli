@@ -53,6 +53,22 @@ function Invoke-MuxxInteractiveProcess {
 function Test-MuxxInteractive {
     try { return [Environment]::UserInteractive -and -not [Console]::IsInputRedirected } catch { return $false }
 }
+function Update-MuxxSessionPath {
+    $machinePath=[Environment]::GetEnvironmentVariable("Path","Machine")
+    $userPath=[Environment]::GetEnvironmentVariable("Path","User")
+    $env:Path=(@($machinePath,$userPath)|Where-Object{$_}|ForEach-Object{$_.TrimEnd(';')}) -join ";"
+}
+function Add-MuxxUserPathEntry {
+    param([string]$Path)
+    if(-not $Path -or -not(Test-Path -LiteralPath $Path)){return $false}
+    $userPath=[Environment]::GetEnvironmentVariable("Path","User")
+    $parts=@($userPath -split ";"|Where-Object{$_})
+    if($parts -notcontains $Path){
+        [Environment]::SetEnvironmentVariable("Path",(($parts+$Path)|Select-Object -Unique)-join ";","User")
+    }
+    Update-MuxxSessionPath
+    return $true
+}
 function Read-MuxxYesNo {
     param([string]$Prompt,[bool]$DefaultYes=$true)
     if(-not(Test-MuxxInteractive)){return $false}
