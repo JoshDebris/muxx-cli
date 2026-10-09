@@ -37,11 +37,13 @@ function Install-MuxxTool {
             "npm" {
                 Write-Host "npm is bundled with Node.js." -ForegroundColor DarkGray
                 Write-Host "Install Node.js instead:  muxx install node" -ForegroundColor DarkGray
+                return $false
             }
             "curl" {
                 Write-Host "curl is built into Windows 10 and newer." -ForegroundColor DarkGray
                 Write-Host "If it is missing, update Windows or download from:" -ForegroundColor DarkGray
                 Write-Host $Tool.Website -ForegroundColor DarkGray
+                return $false
             }
             "composer" {
                 Write-Host "Composer is not available via Winget." -ForegroundColor Yellow
@@ -56,6 +58,10 @@ function Install-MuxxTool {
                     if($proc.ExitCode -ne 0){ return $false }
                     # Refresh session PATH from User & Machine environment to catch new PATH additions
                     $env:Path = ([Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User"))
+                    $installed=Test-MuxxTool -Tool $Tool -ResolveVersion -TimeoutSeconds 5
+                    if($installed.Installed){Write-MuxxToolResult $installed;return $true}
+                    Write-Host "Installed, but not visible in this terminal yet. Open a new terminal." -ForegroundColor Yellow
+                    return $true
                 }catch{
                     Write-Host "Composer installation failed: $($_.Exception.Message)" -ForegroundColor Red
                     Write-Host "Please download manually: https://getcomposer.org/download/" -ForegroundColor DarkGray

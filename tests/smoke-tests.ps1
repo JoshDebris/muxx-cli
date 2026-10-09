@@ -14,4 +14,17 @@ Copy-Item (Join-Path $root "help.txt") (Join-Path $tmp "help.txt")
 Copy-Item (Join-Path $root "src\*.ps1") (Join-Path $tmp "src")
 & (Join-Path $tmp "muxx.cmd") help
 if($LASTEXITCODE -ne 0){throw "Smoke test failed: muxx.cmd help"}
-Write-Host "✅ Smoke tests completed." -ForegroundColor Green
+
+# Package-less special cases must stop before the generic Winget path.
+. (Join-Path $root "src\installer.ps1")
+function Test-MuxxWinget { throw "Winget must not be called for package-less tools" }
+foreach($tool in @(
+    @{Id="npm";Name="npm";WingetId="";Website="https://nodejs.org/"},
+    @{Id="curl";Name="Curl";WingetId="";Website="https://curl.se/windows/"}
+)){
+    $result=Install-MuxxTool -Tool $tool -AssumeYes
+    if($result -ne $false){throw "Package-less install test failed: $($tool.Id)"}
+}
+
+$pass=[char]0x2713
+Write-Host "$pass Smoke tests completed." -ForegroundColor Green
