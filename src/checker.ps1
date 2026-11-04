@@ -4,10 +4,35 @@ function Get-MuxxVersion {
     if(-not $raw){ return "" }
     return ($raw -replace '[\x00-\x1F\x7F]', '').Trim()
 }
+function Resolve-MuxxMSBuild {
+    # Visual Studio does not add MSBuild to the global PATH. Ask its installer
+    # instead of guessing year/edition paths or trusting stale uninstall entries.
+    $programFilesX86=${env:ProgramFiles(x86)}
+    if(-not $programFilesX86){return $null}
+    $vswhere=Join-Path $programFilesX86 "Microsoft Visual Studio\Installer\vswhere.exe"
+    if(-not(Test-Path -LiteralPath $vswhere -PathType Leaf)){return $null}
+    $result=Invoke-MuxxProcess -FilePath $vswhere -Arguments @(
+        "-products","*","-requires","Microsoft.Component.MSBuild",
+        "-sort","-find","MSBuild\**\Bin\MSBuild.exe"
+    ) -TimeoutSeconds 3
+    if(-not $result.Success -or $result.TimedOut){return $null}
+    foreach($line in ($result.Output -split "`r?`n")){
+        $candidate=$line.Trim()
+        if($candidate -and (Test-Path -LiteralPath $candidate -PathType Leaf)){
+            return [pscustomobject]@{Source=$candidate;OnPath=$false;Discovery="Visual Studio Installer (vswhere)"}
+        }
+    }
+    return $null
+}
 function Resolve-MuxxToolCommand {
     param([hashtable]$Tool)
     $cmd=Get-Command $Tool.Command -ErrorAction SilentlyContinue|Select-Object -First 1
     if($cmd){return [pscustomobject]@{Source=$cmd.Source;OnPath=$true}}
+
+    if($Tool.Id -eq "msbuild"){
+        $msbuild=Resolve-MuxxMSBuild
+        if($msbuild){return $msbuild}
+    }
 
     $wingetLinks=Join-Path $env:LOCALAPPDATA "Microsoft\WinGet\Links"
     $names=@($Tool.Command)
@@ -49,9 +74,13 @@ function Test-MuxxTool {
 function Find-MuxxToolLocations {
     param([hashtable]$Tool)
     $checked=@("PATH","Winget links","Winget package directories")
+    if($Tool.Id -eq "msbuild"){$checked+="Visual Studio Installer (vswhere)"}
     $found=@()
     $cmd=Resolve-MuxxToolCommand -Tool $Tool
-    if($cmd){$found+=[pscustomobject]@{Source=$(if($cmd.OnPath){"PATH"}else{"Winget links"});Path=$cmd.Source}}
+    if($cmd){
+        $source=if($cmd.OnPath){"PATH"}elseif($cmd.PSObject.Properties["Discovery"]){$cmd.Discovery}else{"Winget links"}
+        $found+=[pscustomobject]@{Source=$source;Path=$cmd.Source}
+    }
 
     $checked+="Registry"
     $registryRoots=@(
